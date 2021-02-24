@@ -61,10 +61,7 @@ module.exports = function(app) {
         });
     });
   
-    app.get("/api/workouts/range", function(req, res) {
-        console.log("------------------- get: api/workouts/range -----------------------");
-// 
-        // db.Workout.find({}).sort({ day: -1 }).limit(7)
+    app.get("/api/workouts/range", function(req, res) {      
         db.Workout.aggregate(
           [
             {
