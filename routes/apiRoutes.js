@@ -9,8 +9,25 @@ module.exports = function(app) {
         //       res.json(data);
         //     }
         // });
-      db.Workout.find({})
+      db.Workout.aggregate(
+        [
+          {
+            $addFields: {
+              totalDuration: { $sum: "$exercises.duration" }
+            }
+          }
+        ])
         .then(function(results) {
+
+          console.log("------------results-----------------");
+          console.log(results);
+          // db.Workout.aggregate([
+          //   {
+          //     $addFields: {
+          //       totalDuration: { $sum: "$ex"}
+          //     }
+          //   }
+          // ])
           res.json(results);
         })
         .catch(function(err){
@@ -46,14 +63,22 @@ module.exports = function(app) {
   
     app.get("/api/workouts/range", function(req, res) {
         console.log("------------------- get: api/workouts/range -----------------------");
-
-        // db.Workout.find({}, (err, data) => {
-        //     if (err) {
-        //       console.log(err);
-        //     } else {
-        //       res.json(data);
-        //     }
-        // });
+// 
+        // db.Workout.find({}).sort({ day: -1 }).limit(7)
+        db.Workout.aggregate(
+          [
+            {
+              $addFields: {
+                totalDuration: { $sum: "$exercises.duration" }
+              }
+            }
+          ]).sort({ day: -1 }).limit(7)
+          .then(dbWorkout => {
+            res.json(dbWorkout);
+          })
+          .catch(err => {
+            res.json(err);
+          });
     });
 
 };
