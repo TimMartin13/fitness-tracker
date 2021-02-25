@@ -2,32 +2,18 @@ const db = require("../models");
 
 module.exports = function(app) {
     app.get("/api/workouts", function(req, res) {
-        // db.Workout.find({}, (err, data) => {
-        //     if (err) {
-        //       console.log(err);
-        //     } else {
-        //       res.json(data);
-        //     }
-        // });
+      // Aggregate is a findAll with the added bonus of creating a new field if you would like to
       db.Workout.aggregate(
         [
           {
+            // Add a new field
             $addFields: {
+              // Call it totalDuration and sum all of the durations for each workout
               totalDuration: { $sum: "$exercises.duration" }
             }
           }
         ])
         .then(function(results) {
-
-          console.log("------------results-----------------");
-          console.log(results);
-          // db.Workout.aggregate([
-          //   {
-          //     $addFields: {
-          //       totalDuration: { $sum: "$ex"}
-          //     }
-          //   }
-          // ])
           res.json(results);
         })
         .catch(function(err){
@@ -50,8 +36,6 @@ module.exports = function(app) {
     });
   
     app.post("/api/workouts", function(req, res) {
-      // console.log("------------------- post: api/workouts -----------------------");
-      // console.log(req.body);
       db.Workout.create(req.body)
         .then(function(dbWorkout) {
           res.json(dbWorkout);
@@ -69,6 +53,7 @@ module.exports = function(app) {
                 totalDuration: { $sum: "$exercises.duration" }
               }
             }
+            // sort the data by descending order and get only the last 7 entries
           ]).sort({ day: -1 }).limit(7)
           .then(dbWorkout => {
             res.json(dbWorkout);
